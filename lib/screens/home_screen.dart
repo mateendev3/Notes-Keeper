@@ -1,6 +1,9 @@
-import 'package:flutter/material.dart';
+import 'dart:math';
 
+import 'package:flutter/material.dart';
 import '../utils/assets_constants.dart';
+import '../utils/color_constants.dart';
+import '../utils/helper_widgets.dart';
 import 'components/action_icon_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,18 +14,150 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late Size _size;
+  late Random _random;
+
+  @override
+  void initState() {
+    super.initState();
+    _random = Random();
+  }
+
   @override
   Widget build(BuildContext context) {
+    _size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('NotesKeeper'),
-        actions: [
-          buildActionIcon(
-              iconPath: AssetsConsts.icDustbin, onTap: () {}, rightMargin: 8.0),
-          buildActionIcon(
-              iconPath: AssetsConsts.icSearch, onTap: () {}, rightMargin: 10.0),
-        ],
+      appBar: _buildAppBar(),
+      body: Padding(
+        padding: EdgeInsets.all(_size.height * 0.015),
+        child: _random.nextInt(10).isEven
+            ? _buildNotesGridView()
+            : _buildNotesListView(),
       ),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: const Text('NotesKeeper'),
+      actions: [
+        buildActionIcon(
+            iconPath: AssetsConsts.icDustbin, onTap: () {}, rightMargin: 8.0),
+        buildActionIcon(
+            iconPath: AssetsConsts.icSearch, onTap: () {}, rightMargin: 10.0),
+      ],
+    );
+  }
+
+  GridView _buildNotesGridView() {
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: _size.height * 0.01,
+        crossAxisSpacing: _size.height * 0.01,
+      ),
+      itemBuilder: (context, index) {
+        return _buildNotesGridItem(
+          index,
+          title: '10 Excellent font pairing tools for designers.',
+          date: 'Aug 14, 2022',
+        );
+      },
+    );
+  }
+
+  Widget _buildNotesGridItem(
+    int index, {
+    required String title,
+    required String date,
+  }) {
+    return Card(
+      color: AppColors.list[_random.nextInt(AppColors.list.length)],
+      child: InkWell(
+        onTap: () {},
+        splashColor: AppColors.white,
+        child: LayoutBuilder(builder: (context, innerConstraints) {
+          return Padding(
+            padding: EdgeInsets.all(innerConstraints.maxHeight * 0.08),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      title,
+                      maxLines: 4,
+                      style: Theme.of(context).textTheme.headline5!.copyWith(
+                            fontSize: innerConstraints.maxHeight * 0.115,
+                          ),
+                    ),
+                  ),
+                ),
+                Text(
+                  date,
+                  maxLines: 1,
+                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                        fontSize: innerConstraints.maxHeight * 0.08,
+                      ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildNotesListItem(
+    int index, {
+    required String title,
+    required String date,
+  }) {
+    return Card(
+      color: AppColors.list[_random.nextInt(AppColors.list.length)],
+      child: InkWell(
+        onTap: () {},
+        splashColor: AppColors.white,
+        child: Padding(
+          padding: EdgeInsets.all(_size.width * 0.03),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                maxLines: 2,
+                style: Theme.of(context).textTheme.headline5!.copyWith(
+                      fontSize: _size.width * 0.050,
+                    ),
+              ),
+              addVerticalSpace(_size.width * 0.015),
+              Text(
+                date,
+                maxLines: 1,
+                style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                      fontSize: _size.width * 0.035,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotesListView() {
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: EdgeInsets.only(bottom: _size.width * 0.01),
+          child: _buildNotesListItem(
+            index,
+            title: 'How to make your personal brand stands out online.',
+            date: 'Aug 13, 2022',
+          ),
+        );
+      },
     );
   }
 }

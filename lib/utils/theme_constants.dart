@@ -26,10 +26,21 @@ AppBarTheme _getAppBarTheme() {
 
 TextTheme _getTextTheme() {
   return TextTheme(
-    headline1: GoogleFonts.playfairDisplay(
+    headline1: GoogleFonts.poppins(
       color: AppColors.codGray,
       fontSize: 40.0,
       fontWeight: FontWeight.w600,
+    ),
+    headline5: GoogleFonts.poppins(
+      color: AppColors.codGray,
+      fontSize: 18.0,
+      height: 0.0,
+      fontWeight: FontWeight.w500,
+    ),
+    subtitle1: GoogleFonts.poppins(
+      color: AppColors.darkGray,
+      fontSize: 14.0,
+      fontWeight: FontWeight.w400,
     ),
   );
 }

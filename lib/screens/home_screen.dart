@@ -16,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late Size _size;
   late Random _random;
+  bool _showGrid = true;
 
   @override
   void initState() {
@@ -29,10 +30,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: _buildAppBar(),
       body: Padding(
-        padding: EdgeInsets.all(_size.height * 0.015),
-        child: _random.nextInt(10).isEven
-            ? _buildNotesGridView()
-            : _buildNotesListView(),
+        padding: EdgeInsets.only(
+          left: _size.height * 0.015,
+          right: _size.height * 0.015,
+          bottom: _size.height * 0.015,
+        ),
+        child: _buildBody(context),
       ),
     );
   }
@@ -158,6 +161,83 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       },
+    );
+  }
+
+  _buildBody(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(
+            left: _size.height * 0.015,
+            right: _size.height * 0.015,
+            bottom: _size.height * 0.015,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Container(
+                    padding: EdgeInsets.only(
+                      bottom: _size.height * 0.01,
+                    ),
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: AppColors.white,
+                          width: 2.0,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'All Notes',
+                      style: Theme.of(context).textTheme.headline5!.copyWith(
+                            color: AppColors.lightGray,
+                          ),
+                    ),
+                  ),
+                ),
+              ),
+              _buildListingIcon(AssetsConsts.icGrid, () {
+                if (_showGrid) {
+                  return;
+                } else {
+                  setState(() {
+                    _showGrid = true;
+                  });
+                }
+              }),
+              _buildListingIcon(AssetsConsts.icList, () {
+                if (!_showGrid) {
+                  return;
+                } else {
+                  setState(() {
+                    _showGrid = false;
+                  });
+                }
+              }),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _showGrid ? _buildNotesGridView() : _buildNotesListView(),
+        ),
+      ],
+    );
+  }
+
+  IconButton _buildListingIcon(String path, VoidCallback onPressed) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: Image.asset(
+        path,
+        width: 16,
+        height: 16,
+      ),
+      padding: EdgeInsets.zero,
+      splashRadius: 30.0,
     );
   }
 }

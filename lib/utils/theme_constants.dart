@@ -12,7 +12,16 @@ final ThemeData notesTheme = ThemeData(
 );
 
 AppBarTheme _getAppBarTheme() {
-  return const AppBarTheme();
+  return AppBarTheme(
+    elevation: 0.0,
+    shadowColor: Colors.transparent,
+    backgroundColor: Colors.transparent,
+    titleTextStyle: GoogleFonts.poppins(
+      color: AppColors.white,
+      fontSize: 24.0,
+      fontWeight: FontWeight.w500,
+    ),
+  );
 }
 
 TextTheme _getTextTheme() {

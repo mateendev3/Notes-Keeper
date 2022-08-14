@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:notes_keeper/screens/add_note_screen.dart';
 import '../utils/assets_constants.dart';
 import '../utils/color_constants.dart';
 import '../utils/helper_widgets.dart';
@@ -37,6 +38,26 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: _buildBody(context),
       ),
+      floatingActionButton: _buildAddNoteFAB(),
+    );
+  }
+
+  Widget _buildAddNoteFAB() {
+    return FloatingActionButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const AddNoteScreen(),
+          ),
+        );
+      },
+      backgroundColor: AppColors.codGray,
+      child: Icon(
+        Icons.add,
+        color: AppColors.white,
+        size: _size.width * 0.08,
+      ),
     );
   }
 
@@ -52,119 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  GridView _buildNotesGridView() {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: _size.height * 0.01,
-        crossAxisSpacing: _size.height * 0.01,
-      ),
-      itemBuilder: (context, index) {
-        return _buildNotesGridItem(
-          index,
-          title: '10 Excellent font pairing tools for designers.',
-          date: 'Aug 14, 2022',
-        );
-      },
-    );
-  }
-
-  Widget _buildNotesGridItem(
-    int index, {
-    required String title,
-    required String date,
-  }) {
-    return Card(
-      color: AppColors.list[_random.nextInt(AppColors.list.length)],
-      child: InkWell(
-        onTap: () {},
-        splashColor: AppColors.white,
-        child: LayoutBuilder(builder: (context, innerConstraints) {
-          return Padding(
-            padding: EdgeInsets.all(innerConstraints.maxHeight * 0.08),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      title,
-                      maxLines: 4,
-                      style: Theme.of(context).textTheme.headline5!.copyWith(
-                            fontSize: innerConstraints.maxHeight * 0.115,
-                          ),
-                    ),
-                  ),
-                ),
-                Text(
-                  date,
-                  maxLines: 1,
-                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                        fontSize: innerConstraints.maxHeight * 0.08,
-                      ),
-                ),
-              ],
-            ),
-          );
-        }),
-      ),
-    );
-  }
-
-  Widget _buildNotesListItem(
-    int index, {
-    required String title,
-    required String date,
-  }) {
-    return Card(
-      color: AppColors.list[_random.nextInt(AppColors.list.length)],
-      child: InkWell(
-        onTap: () {},
-        splashColor: AppColors.white,
-        child: Padding(
-          padding: EdgeInsets.all(_size.width * 0.03),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                maxLines: 2,
-                style: Theme.of(context).textTheme.headline5!.copyWith(
-                      fontSize: _size.width * 0.050,
-                    ),
-              ),
-              addVerticalSpace(_size.width * 0.015),
-              Text(
-                date,
-                maxLines: 1,
-                style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                      fontSize: _size.width * 0.035,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNotesListView() {
-    return ListView.builder(
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: _size.width * 0.01),
-          child: _buildNotesListItem(
-            index,
-            title: 'How to make your personal brand stands out online.',
-            date: 'Aug 13, 2022',
-          ),
-        );
-      },
-    );
-  }
-
-  _buildBody(BuildContext context) {
+  Widget _buildBody(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -228,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  IconButton _buildListingIcon(String path, VoidCallback onPressed) {
+  Widget _buildListingIcon(String path, VoidCallback onPressed) {
     return IconButton(
       onPressed: onPressed,
       icon: Image.asset(
@@ -238,6 +147,118 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       padding: EdgeInsets.zero,
       splashRadius: 30.0,
+    );
+  }
+
+  Widget _buildNotesGridItem(
+    int index, {
+    required String title,
+    required String date,
+  }) {
+    return Card(
+      color: AppColors.list[_random.nextInt(AppColors.list.length)],
+      child: InkWell(
+        onTap: () {},
+        splashColor: AppColors.white,
+        child: LayoutBuilder(builder: (context, innerConstraints) {
+          return Padding(
+            padding: EdgeInsets.all(innerConstraints.maxHeight * 0.08),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      title,
+                      maxLines: 4,
+                      style: Theme.of(context).textTheme.headline5!.copyWith(
+                            fontSize: innerConstraints.maxHeight * 0.115,
+                          ),
+                    ),
+                  ),
+                ),
+                Text(
+                  date,
+                  maxLines: 1,
+                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                        fontSize: innerConstraints.maxHeight * 0.08,
+                      ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildNotesGridView() {
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: _size.height * 0.01,
+        crossAxisSpacing: _size.height * 0.01,
+      ),
+      itemBuilder: (context, index) {
+        return _buildNotesGridItem(
+          index,
+          title: '10 Excellent font pairing tools for designers.',
+          date: 'Aug 14, 2022',
+        );
+      },
+    );
+  }
+
+  Widget _buildNotesListItem(
+    int index, {
+    required String title,
+    required String date,
+  }) {
+    return Card(
+      color: AppColors.list[_random.nextInt(AppColors.list.length)],
+      child: InkWell(
+        onTap: () {},
+        splashColor: AppColors.white,
+        child: Padding(
+          padding: EdgeInsets.all(_size.width * 0.03),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                maxLines: 2,
+                style: Theme.of(context).textTheme.headline5!.copyWith(
+                      fontSize: _size.width * 0.050,
+                    ),
+              ),
+              addVerticalSpace(_size.width * 0.015),
+              Text(
+                date,
+                maxLines: 1,
+                style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                      fontSize: _size.width * 0.035,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotesListView() {
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: EdgeInsets.only(bottom: _size.width * 0.01),
+          child: _buildNotesListItem(
+            index,
+            title: 'How to make your personal brand stands out online.',
+            date: 'Aug 13, 2022',
+          ),
+        );
+      },
     );
   }
 }

@@ -7,9 +7,15 @@ Widget buildActionIcon({
   IconData? icon,
   required VoidCallback onTap,
   required double rightMargin,
+  double leftMargin = 0.0,
 }) {
   return Container(
-    margin: EdgeInsets.only(top: 10.0, bottom: 10.0, right: rightMargin),
+    margin: EdgeInsets.only(
+      top: 10.0,
+      bottom: 10.0,
+      right: rightMargin,
+      left: leftMargin,
+    ),
     clipBehavior: Clip.hardEdge,
     decoration: BoxDecoration(
       color: AppColors.darkGray,

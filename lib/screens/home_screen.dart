@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:notes_keeper/screens/add_note_screen.dart';
+import 'package:notes_keeper/screens/watch_note_screen.dart';
 import '../utils/assets_constants.dart';
 import '../utils/color_constants.dart';
 import '../utils/helper_widgets.dart';
@@ -158,7 +159,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return Card(
       color: AppColors.list[_random.nextInt(AppColors.list.length)],
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const WatchNoteScreen(),
+            ),
+          );
+        },
         splashColor: AppColors.white,
         child: LayoutBuilder(builder: (context, innerConstraints) {
           return Padding(

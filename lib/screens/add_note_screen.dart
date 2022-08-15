@@ -61,7 +61,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
     return TextFormField(
       selectionControls: MaterialTextSelectionControls(),
       autofocus: true,
-      maxLength: 100,
+      maxLength: 80,
       maxLines: 2,
       decoration: InputDecoration(
         hintText: 'Title',

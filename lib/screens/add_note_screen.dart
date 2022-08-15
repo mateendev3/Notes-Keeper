@@ -35,6 +35,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
       leading: buildActionIcon(
         icon: Icons.arrow_back,
         onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
           Navigator.pop(context);
         },
         rightMargin: 0.0,

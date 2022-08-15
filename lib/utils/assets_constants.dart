@@ -3,4 +3,5 @@ class AssetsConsts {
   static const icDustbin = r'assets/images/ic_dustbin.svg';
   static const icGrid = r'assets/images/ic_grid.png';
   static const icList = r'assets/images/ic_list.png';
+  static const svgEmptyNotes = r'assets/images/svg_empty_notes.svg';
 }

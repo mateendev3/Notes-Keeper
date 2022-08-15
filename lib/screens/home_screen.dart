@@ -1,13 +1,13 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:notes_keeper/screens/add_note_screen.dart';
-import 'package:notes_keeper/screens/search_note_screen.dart';
-import 'package:notes_keeper/screens/watch_note_screen.dart';
+import 'package:flutter_svg/svg.dart';
 import '../utils/assets_constants.dart';
 import '../utils/color_constants.dart';
 import '../utils/helper_widgets.dart';
 import 'components/action_icon_widget.dart';
+import 'add_note_screen.dart';
+import 'search_note_screen.dart';
+import 'watch_note_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -20,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late Size _size;
   late Random _random;
   bool _showGrid = true;
+  List<int> list = [];
 
   @override
   void initState() {
@@ -143,9 +144,30 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         Expanded(
-          child: _showGrid ? _buildNotesGridView() : _buildNotesListView(),
+          child: _buildListOrEmpty(),
         ),
       ],
+    );
+  }
+
+  Widget _buildListOrEmpty() {
+    if (list.isEmpty) {
+      return _buildEmptyNotesUi();
+    } else {
+      return _showGrid ? _buildNotesGridView() : _buildNotesListView();
+    }
+  }
+
+  Widget _buildEmptyNotesUi() {
+    return Center(
+      child: Opacity(
+        opacity: 0.5,
+        child: SvgPicture.asset(
+          AssetsConsts.svgEmptyNotes,
+          width: _size.width * 0.7,
+          height: _size.width * 0.7,
+        ),
+      ),
     );
   }
 

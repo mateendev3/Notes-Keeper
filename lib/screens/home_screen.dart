@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:notes_keeper/screens/add_note_screen.dart';
+import 'package:notes_keeper/screens/search_note_screen.dart';
 import 'package:notes_keeper/screens/watch_note_screen.dart';
 import '../utils/assets_constants.dart';
 import '../utils/color_constants.dart';
@@ -69,7 +70,17 @@ class _HomeScreenState extends State<HomeScreen> {
         buildActionIcon(
             iconPath: AssetsConsts.icDustbin, onTap: () {}, rightMargin: 8.0),
         buildActionIcon(
-            iconPath: AssetsConsts.icSearch, onTap: () {}, rightMargin: 10.0),
+          iconPath: AssetsConsts.icSearch,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const SearchNoteScreen(),
+              ),
+            );
+          },
+          rightMargin: 10.0,
+        ),
       ],
     );
   }

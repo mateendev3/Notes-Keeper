@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../utils/color_constants.dart';
 import 'components/action_button_widget.dart';
 import 'components/action_icon_widget.dart';
@@ -58,33 +57,10 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
     );
   }
 
-  TextFormField _buildNoteTextField() {
-    return TextFormField(
-      selectionControls: MaterialTextSelectionControls(),
-      keyboardType: TextInputType.multiline,
-      textInputAction: TextInputAction.newline,
-      maxLines: null,
-      decoration: InputDecoration(
-        hintText: 'Type Something...',
-        hintStyle: Theme.of(context).textTheme.headline1!.copyWith(
-              color: AppColors.lightGray,
-              fontSize: _size.width * 0.05,
-            ),
-        contentPadding: EdgeInsets.symmetric(
-          vertical: _size.width * 0.02,
-          horizontal: _size.width * 0.02,
-        ),
-        border: InputBorder.none,
-      ),
-      style: Theme.of(context).textTheme.bodyText1!.copyWith(
-            fontSize: _size.width * 0.05,
-          ),
-    );
-  }
-
   TextFormField _buildTitleTextField() {
     return TextFormField(
       selectionControls: MaterialTextSelectionControls(),
+      autofocus: true,
       maxLength: 100,
       maxLines: 2,
       decoration: InputDecoration(
@@ -103,6 +79,29 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
             color: AppColors.white,
             fontSize: _size.width * 0.08,
             fontWeight: FontWeight.w500,
+          ),
+    );
+  }
+
+  TextFormField _buildNoteTextField() {
+    return TextFormField(
+      selectionControls: MaterialTextSelectionControls(),
+      keyboardType: TextInputType.multiline,
+      maxLines: null,
+      decoration: InputDecoration(
+        hintText: 'Type Something...',
+        hintStyle: Theme.of(context).textTheme.headline1!.copyWith(
+              color: AppColors.lightGray,
+              fontSize: _size.width * 0.05,
+            ),
+        contentPadding: EdgeInsets.symmetric(
+          vertical: _size.width * 0.02,
+          horizontal: _size.width * 0.02,
+        ),
+        border: InputBorder.none,
+      ),
+      style: Theme.of(context).textTheme.bodyText1!.copyWith(
+            fontSize: _size.width * 0.05,
           ),
     );
   }

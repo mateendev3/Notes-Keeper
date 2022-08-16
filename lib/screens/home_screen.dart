@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late Size _size;
   late Random _random;
   bool _showGrid = true;
-  List<int> list = [];
+  List<int> list = [1];
 
   @override
   void initState() {

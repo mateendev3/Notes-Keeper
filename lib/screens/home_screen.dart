@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: _buildAppBar(),
-      body: _buildBodyParent(),
+      body: _buildBody(),
       floatingActionButton: _buildAddNoteFAB(),
     );
   }
@@ -74,82 +74,78 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBodyParent() {
+  Widget _buildBody() {
     return Padding(
       padding: EdgeInsets.only(
         left: _size.height * 0.015,
         right: _size.height * 0.015,
         bottom: _size.height * 0.015,
       ),
-      child: _buildBody(),
-    );
-  }
-
-  Widget _buildBody() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(
-            left: _size.height * 0.015,
-            right: _size.height * 0.015,
-            bottom: _size.height * 0.015,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Container(
-                    padding: EdgeInsets.only(
-                      bottom: _size.height * 0.01,
-                    ),
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: AppColors.white,
-                          width: 2.0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+              left: _size.height * 0.015,
+              right: _size.height * 0.015,
+              bottom: _size.height * 0.015,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Container(
+                      padding: EdgeInsets.only(
+                        bottom: _size.height * 0.01,
+                      ),
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: AppColors.white,
+                            width: 2.0,
+                          ),
                         ),
                       ),
-                    ),
-                    child: Text(
-                      'All Notes',
-                      style: Theme.of(context).textTheme.headline5!.copyWith(
-                            color: AppColors.lightGray,
-                          ),
+                      child: Text(
+                        'All Notes',
+                        style: Theme.of(context).textTheme.headline5!.copyWith(
+                              color: AppColors.lightGray,
+                            ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              buildListingIcon(AssetsConsts.icGrid, () {
-                if (_showGrid) {
-                  return;
-                } else {
-                  setState(() => _showGrid = true);
-                }
-              }),
-              buildListingIcon(AssetsConsts.icList, () {
-                if (!_showGrid) {
-                  return;
-                } else {
-                  setState(() {
-                    _showGrid = false;
-                  });
-                }
-              }),
-            ],
+                buildListingIcon(AssetsConsts.icGrid, () {
+                  if (_showGrid) {
+                    return;
+                  } else {
+                    setState(() => _showGrid = true);
+                  }
+                }),
+                buildListingIcon(AssetsConsts.icList, () {
+                  if (!_showGrid) {
+                    return;
+                  } else {
+                    setState(() {
+                      _showGrid = false;
+                    });
+                  }
+                }),
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          child: _isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.white,
-                  ),
-                )
-              : _buildListOrEmpty(),
-        ),
-      ],
+          Expanded(
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.white,
+                    ),
+                  )
+                : _buildListOrEmpty(),
+          ),
+        ],
+      ),
     );
   }
 

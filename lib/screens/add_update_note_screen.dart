@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../utils/color_constants.dart';
 import 'components/action_button_widget.dart';
 import 'components/action_icon_widget.dart';
+import 'components/description_text_field_widget.dart';
+import 'components/title_text_field_widget.dart';
 
 class AddUpdateNoteScreen extends StatefulWidget {
   const AddUpdateNoteScreen({Key? key}) : super(key: key);
@@ -18,14 +19,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
     _size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: _buildAppBar(),
-      body: Padding(
-        padding: EdgeInsets.only(
-          left: _size.height * 0.015,
-          right: _size.height * 0.015,
-          bottom: _size.height * 0.015,
-        ),
-        child: _buildBody(),
-      ),
+      body: _buildBody(),
     );
   }
 
@@ -48,62 +42,20 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
   }
 
   Widget _buildBody() {
-    return Column(
-      children: [
-        _buildTitleTextField(),
-        Expanded(
-          child: _buildDescriptionTextField(),
-        ),
-      ],
-    );
-  }
-
-  TextFormField _buildTitleTextField() {
-    return TextFormField(
-      selectionControls: MaterialTextSelectionControls(),
-      autofocus: true,
-      maxLength: 80,
-      maxLines: 2,
-      decoration: InputDecoration(
-        hintText: 'Title',
-        hintStyle: Theme.of(context).textTheme.headline1!.copyWith(
-              color: AppColors.lightGray,
-              fontSize: _size.width * 0.08,
-            ),
-        contentPadding: EdgeInsets.symmetric(
-          vertical: _size.width * 0.02,
-          horizontal: _size.width * 0.02,
-        ),
-        border: InputBorder.none,
+    return Padding(
+      padding: EdgeInsets.only(
+        left: _size.height * 0.015,
+        right: _size.height * 0.015,
+        bottom: _size.height * 0.015,
       ),
-      style: Theme.of(context).textTheme.bodyText1!.copyWith(
-            color: AppColors.white,
-            fontSize: _size.width * 0.08,
-            fontWeight: FontWeight.w500,
+      child: Column(
+        children: [
+          TitleTextField(size: _size),
+          Expanded(
+            child: DescriptionTextField(size: _size),
           ),
-    );
-  }
-
-  TextFormField _buildDescriptionTextField() {
-    return TextFormField(
-      selectionControls: MaterialTextSelectionControls(),
-      keyboardType: TextInputType.multiline,
-      maxLines: null,
-      decoration: InputDecoration(
-        hintText: 'Type Something...',
-        hintStyle: Theme.of(context).textTheme.headline1!.copyWith(
-              color: AppColors.lightGray,
-              fontSize: _size.width * 0.05,
-            ),
-        contentPadding: EdgeInsets.symmetric(
-          vertical: _size.width * 0.02,
-          horizontal: _size.width * 0.02,
-        ),
-        border: InputBorder.none,
+        ],
       ),
-      style: Theme.of(context).textTheme.bodyText1!.copyWith(
-            fontSize: _size.width * 0.05,
-          ),
     );
   }
 }

@@ -101,4 +101,11 @@ class DBHelper {
       whereArgs: [id],
     );
   }
+
+  // delete all notes
+  Future<int> deleteNotes() async {
+    final Database db = await _getDB();
+
+    return await db.rawDelete(DBConsts.deleteEverythingCommand);
+  }
 }

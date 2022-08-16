@@ -37,7 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
   // method to refresh notes (get notes from db)
   void refreshNotes() async {
     setState(() => _isLoading = true);
-    print('Called');
 
     _noteList = await _db.readAllNotes();
 
@@ -59,7 +58,16 @@ class _HomeScreenState extends State<HomeScreen> {
       title: const Text('NotesKeeper'),
       actions: [
         buildActionIcon(
-            iconPath: AssetsConsts.icDustbin, onTap: () {}, rightMargin: 8.0),
+          iconPath: AssetsConsts.icDustbin,
+          onTap: () async {
+            bool agree = await showAlertDialog();
+            if (agree) {
+              await _db.deleteNotes();
+              refreshNotes();
+            }
+          },
+          rightMargin: 8.0,
+        ),
         buildActionIcon(
           iconPath: AssetsConsts.icSearch,
           onTap: () {
@@ -232,5 +240,39 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       refreshNotes();
     };
+  }
+
+  Future<bool> showAlertDialog() async {
+    return await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete'),
+          content: const Text(
+            'Do you really want to delete all the notes?',
+            style: TextStyle(
+              color: AppColors.white,
+            ),
+          ),
+          actions: [
+            _buildActionButton(
+              'No',
+              () => Navigator.pop(context, false),
+            ),
+            _buildActionButton(
+              'Yes',
+              () => Navigator.pop(context, true),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildActionButton(String text, VoidCallback onTap) {
+    return ElevatedButton(
+      onPressed: onTap,
+      child: Text(text),
+    );
   }
 }

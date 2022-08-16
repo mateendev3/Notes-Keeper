@@ -28,4 +28,6 @@ CREATE TABLE $tableName (
   $colTime $_textType
 )
 ''';
+
+  static const String deleteEverythingCommand = 'DELETE FROM $tableName';
 }

@@ -1,4 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:notes_keeper/databases/db_helper.dart';
 import 'package:notes_keeper/models/note.dart';
 import 'package:notes_keeper/screens/add_update_note_screen.dart';
 import 'package:notes_keeper/utils/assets_constants.dart';
@@ -19,10 +22,12 @@ class WatchNoteScreen extends StatefulWidget {
 class _WatchNoteScreenState extends State<WatchNoteScreen> {
   late Size _size;
   late Note _note;
+  late DBHelper _db;
 
   @override
   void initState() {
     _note = widget.note;
+    _db = DBHelper();
     super.initState();
   }
 
@@ -55,7 +60,13 @@ class _WatchNoteScreenState extends State<WatchNoteScreen> {
       ),
       actions: [
         buildActionIcon(
-          onTap: () {},
+          onTap: () async {
+            bool agree = await showAlertDialog();
+            if (agree) {
+              await _db.deleteNote(_note.id!);
+              Navigator.pop(context);
+            }
+          },
           rightMargin: 15.0,
           iconPath: AssetsConsts.icDustbin,
         ),
@@ -95,15 +106,19 @@ class _WatchNoteScreenState extends State<WatchNoteScreen> {
     );
   }
 
-  Text _buildTitleText() {
-    return Text(
-      _note.title ?? '',
-      maxLines: null,
-      style: Theme.of(context).textTheme.bodyText1!.copyWith(
-            color: AppColors.white,
-            fontSize: _size.width * 0.08,
-            fontWeight: FontWeight.w500,
-          ),
+  Widget _buildTitleText() {
+    return SizedBox(
+      width: double.infinity,
+      child: Text(
+        _note.title ?? '',
+        maxLines: null,
+        textAlign: TextAlign.start,
+        style: Theme.of(context).textTheme.bodyText1!.copyWith(
+              color: AppColors.white,
+              fontSize: _size.width * 0.08,
+              fontWeight: FontWeight.w500,
+            ),
+      ),
     );
   }
 
@@ -115,6 +130,40 @@ class _WatchNoteScreenState extends State<WatchNoteScreen> {
       style: Theme.of(context).textTheme.bodyText1!.copyWith(
             fontSize: _size.width * 0.05,
           ),
+    );
+  }
+
+  Future<bool> showAlertDialog() async {
+    return await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete'),
+          content: const Text(
+            'Do you really want to delete the note?',
+            style: TextStyle(
+              color: AppColors.white,
+            ),
+          ),
+          actions: [
+            _buildActionButton(
+              'No',
+              () => Navigator.pop(context, false),
+            ),
+            _buildActionButton(
+              'Yes',
+              () => Navigator.pop(context, true),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildActionButton(String text, VoidCallback onTap) {
+    return ElevatedButton(
+      onPressed: onTap,
+      child: Text(text),
     );
   }
 }

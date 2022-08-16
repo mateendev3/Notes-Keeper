@@ -7,8 +7,8 @@ import '../utils/db_constants.dart';
 class DBHelper {
   DBHelper._init();
 
-  static late final DBHelper? _dbHelper;
-  late final Database? _database;
+  static DBHelper? _dbHelper;
+  Database? _database;
 
   factory DBHelper() {
     return _dbHelper ??= DBHelper._init();

@@ -1,12 +1,12 @@
 class Note {
   Note({
-    required this.id,
+    this.id,
     this.title,
     this.description,
     this.time,
   });
 
-  int id;
+  int? id;
   String? title;
   String? description;
   DateTime? time;

@@ -1,13 +1,15 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:notes_keeper/databases/db_helper.dart';
+import '../models/note.dart';
 import '../utils/assets_constants.dart';
 import '../utils/color_constants.dart';
-import '../utils/helper_widgets.dart';
 import 'components/action_icon_widget.dart';
-import 'add_note_screen.dart';
+import 'add_update_note_screen.dart';
+import 'components/empty_notes_ui_widget.dart';
+import 'components/listing_icon_widget.dart';
+import 'components/notes_grid_item_widget.dart';
+import 'components/notes_list_item_widget.dart';
 import 'search_note_screen.dart';
-import 'watch_note_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -18,14 +20,26 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Size _size;
-  late Random _random;
   bool _showGrid = true;
-  List<int> list = [1];
+  bool _isLoading = false;
+  late List<Note> _noteList;
+  late final DBHelper _db;
 
   @override
   void initState() {
+    _db = DBHelper();
     super.initState();
-    _random = Random();
+
+    refreshNotes();
+  }
+
+  // method to refresh notes (get notes from db)
+  void refreshNotes() async {
+    setState(() => _isLoading = true);
+
+    _noteList = await _db.readAllNotes();
+
+    setState(() => _isLoading = false);
   }
 
   @override
@@ -33,34 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: _buildAppBar(),
-      body: Padding(
-        padding: EdgeInsets.only(
-          left: _size.height * 0.015,
-          right: _size.height * 0.015,
-          bottom: _size.height * 0.015,
-        ),
-        child: _buildBody(context),
-      ),
+      body: _buildBodyParent(),
       floatingActionButton: _buildAddNoteFAB(),
-    );
-  }
-
-  Widget _buildAddNoteFAB() {
-    return FloatingActionButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const AddNoteScreen(),
-          ),
-        );
-      },
-      backgroundColor: AppColors.codGray,
-      child: Icon(
-        Icons.add,
-        color: AppColors.white,
-        size: _size.width * 0.08,
-      ),
     );
   }
 
@@ -86,7 +74,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildBodyParent() {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: _size.height * 0.015,
+        right: _size.height * 0.015,
+        bottom: _size.height * 0.015,
+      ),
+      child: _buildBody(),
+    );
+  }
+
+  Widget _buildBody() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -122,16 +121,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              _buildListingIcon(AssetsConsts.icGrid, () {
+              buildListingIcon(AssetsConsts.icGrid, () {
                 if (_showGrid) {
                   return;
                 } else {
-                  setState(() {
-                    _showGrid = true;
-                  });
+                  setState(() => _showGrid = true);
                 }
               }),
-              _buildListingIcon(AssetsConsts.icList, () {
+              buildListingIcon(AssetsConsts.icList, () {
                 if (!_showGrid) {
                   return;
                 } else {
@@ -144,94 +141,43 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         Expanded(
-          child: _buildListOrEmpty(),
+          child: _isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.white,
+                  ),
+                )
+              : _buildListOrEmpty(),
         ),
       ],
     );
   }
 
+  Widget _buildAddNoteFAB() {
+    return FloatingActionButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const AddUpdateNoteScreen(),
+          ),
+        );
+      },
+      backgroundColor: AppColors.codGray,
+      child: Icon(
+        Icons.add,
+        color: AppColors.white,
+        size: _size.width * 0.08,
+      ),
+    );
+  }
+
   Widget _buildListOrEmpty() {
-    if (list.isEmpty) {
-      return _buildEmptyNotesUi();
+    if (_noteList.isEmpty) {
+      return buildEmptyNotesUi(_size);
     } else {
       return _showGrid ? _buildNotesGridView() : _buildNotesListView();
     }
-  }
-
-  Widget _buildEmptyNotesUi() {
-    return Center(
-      child: Opacity(
-        opacity: 0.5,
-        child: SvgPicture.asset(
-          AssetsConsts.svgEmptyNotes,
-          width: _size.width * 0.7,
-          height: _size.width * 0.7,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildListingIcon(String path, VoidCallback onPressed) {
-    return IconButton(
-      onPressed: onPressed,
-      icon: Image.asset(
-        path,
-        width: 16,
-        height: 16,
-      ),
-      padding: EdgeInsets.zero,
-      splashRadius: 30.0,
-    );
-  }
-
-  Widget _buildNotesGridItem(
-    int index, {
-    required String title,
-    required String date,
-  }) {
-    return Card(
-      color: AppColors.list[_random.nextInt(AppColors.list.length)],
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const WatchNoteScreen(),
-            ),
-          );
-        },
-        splashColor: AppColors.white,
-        child: LayoutBuilder(builder: (context, innerConstraints) {
-          return Padding(
-            padding: EdgeInsets.all(innerConstraints.maxHeight * 0.08),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      title,
-                      maxLines: 4,
-                      style: Theme.of(context).textTheme.headline5!.copyWith(
-                            fontSize: innerConstraints.maxHeight * 0.115,
-                          ),
-                    ),
-                  ),
-                ),
-                Text(
-                  date,
-                  maxLines: 1,
-                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                        fontSize: innerConstraints.maxHeight * 0.08,
-                      ),
-                ),
-              ],
-            ),
-          );
-        }),
-      ),
-    );
   }
 
   Widget _buildNotesGridView() {
@@ -242,49 +188,13 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisSpacing: _size.height * 0.01,
       ),
       itemBuilder: (context, index) {
-        return _buildNotesGridItem(
-          index,
-          title: '10 Excellent font pairing tools for designers.',
-          date: 'Aug 14, 2022',
+        return NotesGridItem(
+          note: Note(
+            title: '10 Excellent font pairing tools for designers.',
+            time: DateTime.now(),
+          ),
         );
       },
-    );
-  }
-
-  Widget _buildNotesListItem(
-    int index, {
-    required String title,
-    required String date,
-  }) {
-    return Card(
-      color: AppColors.list[_random.nextInt(AppColors.list.length)],
-      child: InkWell(
-        onTap: () {},
-        splashColor: AppColors.white,
-        child: Padding(
-          padding: EdgeInsets.all(_size.width * 0.03),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                maxLines: 2,
-                style: Theme.of(context).textTheme.headline5!.copyWith(
-                      fontSize: _size.width * 0.050,
-                    ),
-              ),
-              addVerticalSpace(_size.width * 0.015),
-              Text(
-                date,
-                maxLines: 1,
-                style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                      fontSize: _size.width * 0.035,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -293,13 +203,22 @@ class _HomeScreenState extends State<HomeScreen> {
       itemBuilder: (context, index) {
         return Padding(
           padding: EdgeInsets.only(bottom: _size.width * 0.01),
-          child: _buildNotesListItem(
-            index,
-            title: 'How to make your personal brand stands out online.',
-            date: 'Aug 13, 2022',
+          child: NotesListItem(
+            size: _size,
+            note: Note(
+                title: 'How to make your personal brand stands out online.',
+                time: DateTime.now()),
           ),
         );
       },
     );
   }
+
+  @override
+  void dispose() {
+    closeDB();
+    super.dispose();
+  }
+
+  void closeDB() async => await _db.closeDatabase();
 }

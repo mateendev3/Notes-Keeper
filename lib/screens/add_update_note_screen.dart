@@ -3,14 +3,14 @@ import '../utils/color_constants.dart';
 import 'components/action_button_widget.dart';
 import 'components/action_icon_widget.dart';
 
-class AddNoteScreen extends StatefulWidget {
-  const AddNoteScreen({Key? key}) : super(key: key);
+class AddUpdateNoteScreen extends StatefulWidget {
+  const AddUpdateNoteScreen({Key? key}) : super(key: key);
 
   @override
-  State<AddNoteScreen> createState() => _AddNoteScreenState();
+  State<AddUpdateNoteScreen> createState() => _AddUpdateNoteScreenState();
 }
 
-class _AddNoteScreenState extends State<AddNoteScreen> {
+class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
   late Size _size;
 
   @override
@@ -52,7 +52,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
       children: [
         _buildTitleTextField(),
         Expanded(
-          child: _buildNoteTextField(),
+          child: _buildDescriptionTextField(),
         ),
       ],
     );
@@ -84,7 +84,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
     );
   }
 
-  TextFormField _buildNoteTextField() {
+  TextFormField _buildDescriptionTextField() {
     return TextFormField(
       selectionControls: MaterialTextSelectionControls(),
       keyboardType: TextInputType.multiline,

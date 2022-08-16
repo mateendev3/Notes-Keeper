@@ -10,6 +10,7 @@ import 'components/listing_icon_widget.dart';
 import 'components/notes_grid_item_widget.dart';
 import 'components/notes_list_item_widget.dart';
 import 'search_note_screen.dart';
+import 'watch_note_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -36,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // method to refresh notes (get notes from db)
   void refreshNotes() async {
     setState(() => _isLoading = true);
+    print('Called');
 
     _noteList = await _db.readAllNotes();
 
@@ -151,13 +153,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildAddNoteFAB() {
     return FloatingActionButton(
-      onPressed: () {
-        Navigator.push(
+      onPressed: () async {
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => const AddUpdateNoteScreen(),
           ),
         );
+        refreshNotes();
       },
       backgroundColor: AppColors.codGray,
       child: Icon(
@@ -183,12 +186,11 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisSpacing: _size.height * 0.01,
         crossAxisSpacing: _size.height * 0.01,
       ),
+      itemCount: _noteList.length,
       itemBuilder: (context, index) {
         return NotesGridItem(
-          note: Note(
-            title: '10 Excellent font pairing tools for designers.',
-            time: DateTime.now(),
-          ),
+          note: _noteList[index],
+          onTap: onNoteItemTap(index),
         );
       },
     );
@@ -196,14 +198,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildNotesListView() {
     return ListView.builder(
+      itemCount: _noteList.length,
       itemBuilder: (context, index) {
         return Padding(
           padding: EdgeInsets.only(bottom: _size.width * 0.01),
           child: NotesListItem(
             size: _size,
-            note: Note(
-                title: 'How to make your personal brand stands out online.',
-                time: DateTime.now()),
+            note: _noteList[index],
+            onTap: onNoteItemTap(index),
           ),
         );
       },
@@ -217,4 +219,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void closeDB() async => await _db.closeDatabase();
+
+  VoidCallback onNoteItemTap(int index) {
+    return () async {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => WatchNoteScreen(
+            note: _noteList[index],
+          ),
+        ),
+      );
+      refreshNotes();
+    };
+  }
 }

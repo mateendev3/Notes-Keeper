@@ -2,17 +2,23 @@ import 'package:flutter/material.dart';
 import '../../utils/color_constants.dart';
 
 class TitleTextField extends StatelessWidget {
-  const TitleTextField({Key? key, required Size size})
-      : _size = size,
+  const TitleTextField({
+    Key? key,
+    required Size size,
+    required TextEditingController controller,
+  })  : _size = size,
+        _titleController = controller,
         super(key: key);
 
   final Size _size;
+  final TextEditingController _titleController;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       selectionControls: MaterialTextSelectionControls(),
       autofocus: true,
+      controller: _titleController,
       maxLength: 80,
       maxLines: 2,
       decoration: InputDecoration(

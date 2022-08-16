@@ -2,16 +2,22 @@ import 'package:flutter/material.dart';
 import '../../utils/color_constants.dart';
 
 class DescriptionTextField extends StatelessWidget {
-  const DescriptionTextField({Key? key, required Size size})
-      : _size = size,
+  const DescriptionTextField({
+    Key? key,
+    required Size size,
+    required TextEditingController controller,
+  })  : _size = size,
+        _descriptionController = controller,
         super(key: key);
 
   final Size _size;
+  final TextEditingController _descriptionController;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       selectionControls: MaterialTextSelectionControls(),
+      controller: _descriptionController,
       keyboardType: TextInputType.multiline,
       maxLines: null,
       decoration: InputDecoration(

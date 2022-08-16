@@ -3,30 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/note.dart';
 import '../../utils/color_constants.dart';
-import '../watch_note_screen.dart';
 
 class NotesGridItem extends StatelessWidget {
   NotesGridItem({
     Key? key,
     required this.note,
+    required this.onTap,
   }) : super(key: key);
 
   final Random random = Random();
   final Note note;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       color: AppColors.list[random.nextInt(AppColors.list.length)],
       child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const WatchNoteScreen(),
-            ),
-          );
-        },
+        onTap: onTap,
         splashColor: AppColors.white,
         child: LayoutBuilder(builder: (context, innerConstraints) {
           return Padding(

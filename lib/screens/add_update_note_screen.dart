@@ -1,11 +1,17 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:notes_keeper/databases/db_helper.dart';
+import '../models/note.dart';
 import 'components/action_button_widget.dart';
 import 'components/action_icon_widget.dart';
 import 'components/description_text_field_widget.dart';
 import 'components/title_text_field_widget.dart';
 
 class AddUpdateNoteScreen extends StatefulWidget {
-  const AddUpdateNoteScreen({Key? key}) : super(key: key);
+  const AddUpdateNoteScreen({Key? key, this.note}) : super(key: key);
+
+  final Note? note;
 
   @override
   State<AddUpdateNoteScreen> createState() => _AddUpdateNoteScreenState();
@@ -13,6 +19,22 @@ class AddUpdateNoteScreen extends StatefulWidget {
 
 class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
   late Size _size;
+  late DBHelper _db;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+  late Note _note;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _db = DBHelper();
+    _titleController = TextEditingController();
+    _descriptionController = TextEditingController();
+    _titleController.text = widget.note?.title ?? '';
+    _descriptionController.text = widget.note?.description ?? '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +58,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
         leftMargin: 15.0,
       ),
       actions: [
-        buildActionButton(context, text: "Save"),
+        buildActionButton(context, text: "Save", onTap: onTapSave),
       ],
     );
   }
@@ -48,13 +70,54 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
         right: _size.height * 0.015,
         bottom: _size.height * 0.015,
       ),
-      child: Column(
-        children: [
-          TitleTextField(size: _size),
-          Expanded(
-            child: DescriptionTextField(size: _size),
-          ),
-        ],
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            TitleTextField(
+              size: _size,
+              controller: _titleController,
+            ),
+            Expanded(
+              child: DescriptionTextField(
+                size: _size,
+                controller: _descriptionController,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void onTapSave() async {
+    bool isValid = _formKey.currentState!.validate();
+
+    if (isValid) {
+      if (widget.note != null) {
+        await updateNote();
+        Navigator.pop(context, _note);
+      } else {
+        await insertNote();
+        Navigator.pop(context);
+      }
+    }
+  }
+
+  Future<void> updateNote() async {
+    _note = widget.note!.copyWith(
+      title: _titleController.text,
+      description: _descriptionController.text,
+    );
+    await _db.updateNote(_note);
+  }
+
+  Future<void> insertNote() async {
+    await _db.insertNote(
+      Note(
+        title: _titleController.text,
+        description: _descriptionController.text,
+        time: DateTime.now(),
       ),
     );
   }

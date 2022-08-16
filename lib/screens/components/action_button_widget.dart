@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../utils/color_constants.dart';
 
-buildActionButton(BuildContext context, {required String text}) {
+buildActionButton(
+  BuildContext context, {
+  required String text,
+  required VoidCallback onTap,
+}) {
   return Container(
     margin: const EdgeInsets.only(
       top: 10.0,
@@ -18,7 +22,7 @@ buildActionButton(BuildContext context, {required String text}) {
     child: Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {},
+        onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(
             vertical: 8.0,

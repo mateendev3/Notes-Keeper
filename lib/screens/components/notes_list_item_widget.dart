@@ -10,18 +10,20 @@ class NotesListItem extends StatelessWidget {
     Key? key,
     required this.size,
     required this.note,
+    required this.onTap,
   }) : super(key: key);
 
   final Random random = Random();
   final Note note;
   final Size size;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       color: AppColors.list[random.nextInt(AppColors.list.length)],
       child: InkWell(
-        onTap: () {},
+        onTap: onTap,
         splashColor: AppColors.white,
         child: Padding(
           padding: EdgeInsets.all(size.width * 0.03),

@@ -181,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildListOrEmpty() {
     if (_noteList.isEmpty) {
-      return buildEmptyNotesUi(_size);
+      return buildEmptyNotesUi(_size, path: AssetsConsts.svgEmptyNotes);
     } else {
       return _showGrid ? _buildNotesGridView() : _buildNotesListView();
     }

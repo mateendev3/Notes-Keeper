@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:notes_keeper/databases/db_helper.dart';
 import 'package:notes_keeper/utils/color_constants.dart';
+import '../models/note.dart';
+import '../utils/assets_constants.dart';
 import 'components/action_icon_widget.dart';
+import 'components/empty_notes_ui_widget.dart';
+import 'components/notes_list_item_widget.dart';
+import 'watch_note_screen.dart';
 
 class SearchNoteScreen extends StatefulWidget {
   const SearchNoteScreen({Key? key}) : super(key: key);
@@ -12,12 +18,24 @@ class SearchNoteScreen extends StatefulWidget {
 class _SearchNoteScreenState extends State<SearchNoteScreen> {
   late Size _size;
   late final TextEditingController _searchController;
+  late List<Note> _noteList;
+  late List<Note> _filteredList;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    refreshNotes();
     _searchController = TextEditingController();
-    _searchController.addListener(_textChangedListener);
+  }
+
+  void refreshNotes() async {
+    setState(() => _isLoading = true);
+
+    _noteList = await DBHelper().readAllNotes();
+    _filteredList = _noteList;
+
+    setState(() => _isLoading = false);
   }
 
   @override
@@ -25,14 +43,7 @@ class _SearchNoteScreenState extends State<SearchNoteScreen> {
     _size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: _buildAppBar(),
-      body: Padding(
-        padding: EdgeInsets.only(
-          top: _size.height * 0.02,
-          left: _size.height * 0.035,
-          right: _size.height * 0.035,
-        ),
-        child: _buildBody(),
-      ),
+      body: _buildBody(),
     );
   }
 
@@ -53,20 +64,43 @@ class _SearchNoteScreenState extends State<SearchNoteScreen> {
   }
 
   Widget _buildBody() {
-    return Column(
-      children: [
-        _buildSearchNoteTF(),
-        const Expanded(
-          child: SizedBox(),
-        ),
-      ],
+    return Padding(
+      padding: EdgeInsets.only(
+        top: _size.height * 0.02,
+        left: _size.height * 0.035,
+        right: _size.height * 0.035,
+      ),
+      child: Column(
+        children: [
+          _buildSearchNoteTF(),
+          Expanded(
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.white,
+                    ),
+                  )
+                : _buildBodyUi(),
+          ),
+        ],
+      ),
     );
+  }
+
+  Widget _buildBodyUi() {
+    return _filteredList.isNotEmpty
+        ? _buildNotesListView()
+        : buildEmptyNotesUi(
+            _size,
+            path: AssetsConsts.svgNotFound,
+          );
   }
 
   TextField _buildSearchNoteTF() {
     return TextField(
       controller: _searchController,
       cursorColor: AppColors.orange,
+      onChanged: _onChangedText,
       style: Theme.of(context).textTheme.bodyText1!.copyWith(
             fontSize: _size.width * 0.04,
           ),
@@ -82,6 +116,7 @@ class _SearchNoteScreenState extends State<SearchNoteScreen> {
             : IconButton(
                 onPressed: () {
                   _searchController.clear();
+                  refreshNotes();
                 },
                 icon: const Icon(
                   Icons.cancel,
@@ -107,7 +142,45 @@ class _SearchNoteScreenState extends State<SearchNoteScreen> {
     );
   }
 
-  void _textChangedListener() {
+  Widget _buildNotesListView() {
+    return Padding(
+      padding: EdgeInsets.only(top: _size.width * 0.07),
+      child: ListView.builder(
+        itemCount: _filteredList.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: _size.width * 0.01),
+            child: NotesListItem(
+              size: _size,
+              note: _filteredList[index],
+              onTap: onNoteItemTap(index),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  VoidCallback onNoteItemTap(int index) {
+    return () async {
+      _searchController.clear();
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => WatchNoteScreen(
+            note: _noteList[index],
+          ),
+        ),
+      );
+      refreshNotes();
+    };
+  }
+
+  void _onChangedText(String value) {
+    _filteredList = _noteList
+        .where(
+            (note) => note.title!.toLowerCase().contains(value.toLowerCase()))
+        .toList();
     setState(() {});
   }
 }

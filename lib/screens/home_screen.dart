@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:notes_keeper/databases/db_helper.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import '../databases/db_helper.dart';
 import '../models/note.dart';
 import '../utils/assets_constants.dart';
 import '../utils/color_constants.dart';
@@ -126,22 +127,28 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                buildListingIcon(AssetsConsts.icGrid, () {
-                  if (_showGrid) {
-                    return;
-                  } else {
-                    setState(() => _showGrid = true);
-                  }
-                }),
-                buildListingIcon(AssetsConsts.icList, () {
-                  if (!_showGrid) {
-                    return;
-                  } else {
-                    setState(() {
-                      _showGrid = false;
-                    });
-                  }
-                }),
+                buildListingIcon(
+                  AssetsConsts.icGrid,
+                  () {
+                    if (_showGrid) {
+                      return;
+                    } else {
+                      setState(() => _showGrid = true);
+                    }
+                  },
+                ),
+                buildListingIcon(
+                  AssetsConsts.icList,
+                  () {
+                    if (!_showGrid) {
+                      return;
+                    } else {
+                      setState(() {
+                        _showGrid = false;
+                      });
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -160,21 +167,35 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildAddNoteFAB() {
-    return FloatingActionButton(
-      onPressed: () async {
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const AddUpdateNoteScreen(),
-          ),
+    return TweenAnimationBuilder<Offset>(
+      duration: const Duration(seconds: 2),
+      tween: Tween<Offset>(
+        begin: const Offset(0, -800),
+        end: const Offset(0, 0),
+      ),
+      curve: Curves.bounceOut,
+      builder: (context, Offset offset, child) {
+        return Transform.translate(
+          offset: offset,
+          child: child,
         );
-        refreshNotes();
       },
-      backgroundColor: AppColors.codGray,
-      child: Icon(
-        Icons.add,
-        color: AppColors.white,
-        size: _size.width * 0.08,
+      child: FloatingActionButton(
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AddUpdateNoteScreen(),
+            ),
+          );
+          refreshNotes();
+        },
+        backgroundColor: AppColors.white,
+        child: Icon(
+          Icons.add,
+          color: AppColors.codGray,
+          size: _size.width * 0.08,
+        ),
       ),
     );
   }
@@ -188,35 +209,57 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildNotesGridView() {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: _size.height * 0.01,
-        crossAxisSpacing: _size.height * 0.01,
+    return AnimationLimiter(
+      child: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: _size.height * 0.01,
+          crossAxisSpacing: _size.height * 0.01,
+        ),
+        itemCount: _noteList.length,
+        itemBuilder: (context, index) {
+          return AnimationConfiguration.staggeredGrid(
+            position: index,
+            columnCount: 2,
+            duration: const Duration(milliseconds: 500),
+            child: ScaleAnimation(
+              child: FadeInAnimation(
+                child: NotesGridItem(
+                  note: _noteList[index],
+                  onTap: onNoteItemTap(index),
+                ),
+              ),
+            ),
+          );
+        },
       ),
-      itemCount: _noteList.length,
-      itemBuilder: (context, index) {
-        return NotesGridItem(
-          note: _noteList[index],
-          onTap: onNoteItemTap(index),
-        );
-      },
     );
   }
 
   Widget _buildNotesListView() {
-    return ListView.builder(
-      itemCount: _noteList.length,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: _size.width * 0.01),
-          child: NotesListItem(
-            size: _size,
-            note: _noteList[index],
-            onTap: onNoteItemTap(index),
-          ),
-        );
-      },
+    return AnimationLimiter(
+      child: ListView.builder(
+        itemCount: _noteList.length,
+        itemBuilder: (context, index) {
+          return AnimationConfiguration.staggeredList(
+            position: index,
+            duration: const Duration(milliseconds: 500),
+            child: SlideAnimation(
+              verticalOffset: 50,
+              child: FadeInAnimation(
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: _size.width * 0.01),
+                  child: NotesListItem(
+                    size: _size,
+                    note: _noteList[index],
+                    onTap: onNoteItemTap(index),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 

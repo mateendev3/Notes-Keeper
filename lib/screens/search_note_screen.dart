@@ -100,6 +100,7 @@ class _SearchNoteScreenState extends State<SearchNoteScreen> {
     return TextField(
       controller: _searchController,
       cursorColor: AppColors.orange,
+      autofocus: true,
       onChanged: _onChangedText,
       style: Theme.of(context).textTheme.bodyText1!.copyWith(
             fontSize: _size.width * 0.04,
@@ -168,7 +169,7 @@ class _SearchNoteScreenState extends State<SearchNoteScreen> {
         context,
         MaterialPageRoute(
           builder: (_) => WatchNoteScreen(
-            note: _noteList[index],
+            note: _filteredList[index],
           ),
         ),
       );

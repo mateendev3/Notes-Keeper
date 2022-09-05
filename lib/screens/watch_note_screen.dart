@@ -9,6 +9,7 @@ import 'package:notes_keeper/utils/helper_widgets.dart';
 
 import '../utils/color_constants.dart';
 import 'components/action_icon_widget.dart';
+import 'components/delete_note_alert_dialog_widget.dart';
 
 class WatchNoteScreen extends StatefulWidget {
   const WatchNoteScreen({Key? key, required this.note}) : super(key: key);
@@ -61,7 +62,7 @@ class _WatchNoteScreenState extends State<WatchNoteScreen> {
       actions: [
         buildActionIcon(
           onTap: () async {
-            bool agree = await showAlertDialog();
+            bool agree = await showDeleteNoteDialog(context);
             if (agree) {
               await _db.deleteNote(_note.id!);
               Navigator.pop(context);
@@ -130,40 +131,6 @@ class _WatchNoteScreenState extends State<WatchNoteScreen> {
       style: Theme.of(context).textTheme.bodyText1!.copyWith(
             fontSize: _size.width * 0.05,
           ),
-    );
-  }
-
-  Future<bool> showAlertDialog() async {
-    return await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete'),
-          content: const Text(
-            'Do you really want to delete the note?',
-            style: TextStyle(
-              color: AppColors.white,
-            ),
-          ),
-          actions: [
-            _buildActionButton(
-              'No',
-              () => Navigator.pop(context, false),
-            ),
-            _buildActionButton(
-              'Yes',
-              () => Navigator.pop(context, true),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildActionButton(String text, VoidCallback onTap) {
-    return ElevatedButton(
-      onPressed: onTap,
-      child: Text(text),
     );
   }
 }

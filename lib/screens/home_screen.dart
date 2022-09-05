@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:notes_keeper/screens/components/delete_note_alert_dialog_widget.dart';
+import 'package:notes_keeper/screens/components/delete_notes_alert_dialog_widget.dart';
+import 'package:notes_keeper/screens/components/dismissible_background.dart';
 import '../databases/db_helper.dart';
 import '../models/note.dart';
 import '../utils/assets_constants.dart';
@@ -35,6 +38,12 @@ class _HomeScreenState extends State<HomeScreen> {
     refreshNotes();
   }
 
+  @override
+  void dispose() {
+    closeDB();
+    super.dispose();
+  }
+
   // method to refresh notes (get notes from db)
   void refreshNotes() async {
     setState(() => _isLoading = true);
@@ -61,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
         buildActionIcon(
           iconPath: AssetsConsts.icDustbin,
           onTap: () async {
-            bool agree = await showAlertDialog();
+            bool agree = await showDeleteAllNotesDialog(context);
             if (agree) {
               await _db.deleteNotes();
               refreshNotes();
@@ -226,7 +235,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: FadeInAnimation(
                 child: NotesGridItem(
                   note: _noteList[index],
-                  onTap: onNoteItemTap(index),
+                  onGridItemTap: onNoteItemTap(index),
+                  onGridItemLongPress: onNoteItemLongPress(index),
                 ),
               ),
             ),
@@ -241,18 +251,63 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ListView.builder(
         itemCount: _noteList.length,
         itemBuilder: (context, index) {
-          return AnimationConfiguration.staggeredList(
-            position: index,
-            duration: const Duration(milliseconds: 500),
-            child: SlideAnimation(
-              verticalOffset: 50,
-              child: FadeInAnimation(
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: _size.width * 0.01),
-                  child: NotesListItem(
-                    size: _size,
-                    note: _noteList[index],
-                    onTap: onNoteItemTap(index),
+          return Dismissible(
+            key: ObjectKey(_noteList[index]),
+            confirmDismiss: (direction) async {
+              switch (direction) {
+                case DismissDirection.startToEnd:
+                  bool wannaDelete = await showDeleteNoteDialog(context);
+                  if (wannaDelete) {
+                    _noteList.remove(_noteList[index]);
+                    _db.deleteNote(_noteList[index].id!);
+
+                    return true;
+                  } else {
+                    return false;
+                  }
+                case DismissDirection.endToStart:
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AddUpdateNoteScreen(
+                        note: _noteList[index],
+                      ),
+                    ),
+                  );
+                  refreshNotes();
+                  return false;
+                default:
+                  return true;
+              }
+            },
+            background: buildDismissibleBackground(
+              size: _size,
+              color: Colors.red,
+              icon: Icons.delete,
+              title: 'Delete',
+            ),
+            secondaryBackground: buildDismissibleBackground(
+              size: _size,
+              color: Colors.green,
+              icon: Icons.edit,
+              title: 'Edit Note',
+            ),
+            child: AnimationConfiguration.staggeredList(
+              position: index,
+              duration: const Duration(milliseconds: 500),
+              child: SlideAnimation(
+                verticalOffset: 50,
+                child: FadeInAnimation(
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: _size.width * 0.01),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: NotesListItem(
+                        size: _size,
+                        note: _noteList[index],
+                        onTap: onNoteItemTap(index),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -261,12 +316,6 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    closeDB();
-    super.dispose();
   }
 
   void closeDB() async => await _db.closeDatabase();
@@ -285,37 +334,15 @@ class _HomeScreenState extends State<HomeScreen> {
     };
   }
 
-  Future<bool> showAlertDialog() async {
-    return await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete'),
-          content: const Text(
-            'Do you really want to delete all the notes?',
-            style: TextStyle(
-              color: AppColors.white,
-            ),
-          ),
-          actions: [
-            _buildActionButton(
-              'No',
-              () => Navigator.pop(context, false),
-            ),
-            _buildActionButton(
-              'Yes',
-              () => Navigator.pop(context, true),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  VoidCallback onNoteItemLongPress(int index) {
+    return () async {
+      bool wannaDelete = await showDeleteNoteDialog(context);
+      if (wannaDelete) {
+        _noteList.remove(_noteList[index]);
+        _db.deleteNote(_noteList[index].id!);
 
-  Widget _buildActionButton(String text, VoidCallback onTap) {
-    return ElevatedButton(
-      onPressed: onTap,
-      child: Text(text),
-    );
+        refreshNotes();
+      }
+    };
   }
 }

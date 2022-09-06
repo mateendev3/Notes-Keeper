@@ -2,15 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:notes_keeper/screens/components/delete_note_alert_dialog_widget.dart';
-import 'package:notes_keeper/screens/components/delete_notes_alert_dialog_widget.dart';
-import 'package:notes_keeper/screens/components/dismissible_background.dart';
 import '../databases/db_helper.dart';
 import '../models/note.dart';
 import '../utils/assets_constants.dart';
 import '../utils/color_constants.dart';
 import 'components/action_icon_widget.dart';
 import 'add_update_note_screen.dart';
+import 'components/delete_note_alert_dialog_widget.dart';
+import 'components/delete_notes_alert_dialog_widget.dart';
+import 'components/dismissible_background.dart';
 import 'components/empty_notes_ui_widget.dart';
 import 'components/listing_icon_widget.dart';
 import 'components/notes_grid_item_widget.dart';

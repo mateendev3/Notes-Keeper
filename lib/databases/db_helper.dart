@@ -97,7 +97,7 @@ class DBHelper {
 
     return await db.delete(
       DBConsts.tableName,
-      where: '${DBConsts.colId}= ?',
+      where: '${DBConsts.colId} = ?',
       whereArgs: [id],
     );
   }

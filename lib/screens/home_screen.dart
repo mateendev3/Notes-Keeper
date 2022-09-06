@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:notes_keeper/screens/components/delete_note_alert_dialog_widget.dart';
@@ -29,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = false;
   late List<Note> _noteList;
   late final DBHelper _db;
+  bool _wannaDeleteListItem = false;
 
   @override
   void initState() {
@@ -253,44 +256,13 @@ class _HomeScreenState extends State<HomeScreen> {
         itemBuilder: (context, index) {
           return Dismissible(
             key: ObjectKey(_noteList[index]),
-            confirmDismiss: (direction) async {
-              switch (direction) {
-                case DismissDirection.startToEnd:
-                  bool wannaDelete = await showDeleteNoteDialog(context);
-                  if (wannaDelete) {
-                    _noteList.remove(_noteList[index]);
-                    _db.deleteNote(_noteList[index].id!);
-
-                    return true;
-                  } else {
-                    return false;
-                  }
-                case DismissDirection.endToStart:
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => AddUpdateNoteScreen(
-                        note: _noteList[index],
-                      ),
-                    ),
-                  );
-                  refreshNotes();
-                  return false;
-                default:
-                  return true;
-              }
-            },
+            direction: DismissDirection.startToEnd,
+            confirmDismiss: deleteNoteConfirmDismiss(index),
             background: buildDismissibleBackground(
               size: _size,
               color: Colors.red,
               icon: Icons.delete,
               title: 'Delete',
-            ),
-            secondaryBackground: buildDismissibleBackground(
-              size: _size,
-              color: Colors.green,
-              icon: Icons.edit,
-              title: 'Edit Note',
             ),
             child: AnimationConfiguration.staggeredList(
               position: index,
@@ -336,13 +308,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
   VoidCallback onNoteItemLongPress(int index) {
     return () async {
-      bool wannaDelete = await showDeleteNoteDialog(context);
-      if (wannaDelete) {
-        _noteList.remove(_noteList[index]);
-        _db.deleteNote(_noteList[index].id!);
+      bool wannaDeleteGridItem = await showDeleteNoteDialog(context);
 
-        refreshNotes();
+      if (wannaDeleteGridItem) {
+        _db.deleteNote(_noteList[index].id!);
+        setState(() {
+          _noteList.remove(_noteList[index]);
+          wannaDeleteGridItem = false;
+        });
       }
+    };
+  }
+
+  ConfirmDismissCallback deleteNoteConfirmDismiss(int index) {
+    return (direction) async {
+      _wannaDeleteListItem = await showDeleteNoteDialog(context);
+
+      if (_wannaDeleteListItem) {
+        _db.deleteNote(_noteList[index].id!);
+        setState(() {
+          _noteList.remove(_noteList[index]);
+          _wannaDeleteListItem = false;
+        });
+
+        return true;
+      }
+
+      return false;
     };
   }
 }

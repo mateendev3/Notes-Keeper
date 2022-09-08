@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:notes_keeper/databases/db_helper.dart';
+import '../databases/db_helper.dart';
 import '../models/note.dart';
 import 'components/action_button_widget.dart';
 import 'components/action_icon_widget.dart';

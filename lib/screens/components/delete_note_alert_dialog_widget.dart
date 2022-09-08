@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:notes_keeper/screens/components/dialog_action_button.dart';
-
 import '../../utils/color_constants.dart';
+import 'dialog_action_button.dart';
 
 Future<bool> showDeleteNoteDialog(BuildContext context) async {
   return await showDialog(

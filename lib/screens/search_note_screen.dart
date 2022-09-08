@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:notes_keeper/databases/db_helper.dart';
-import 'package:notes_keeper/utils/color_constants.dart';
+import '../databases/db_helper.dart';
 import '../models/note.dart';
 import '../utils/assets_constants.dart';
+import '../utils/color_constants.dart';
 import 'components/action_icon_widget.dart';
 import 'components/empty_notes_ui_widget.dart';
 import 'components/notes_list_item_widget.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../utils/helper_widgets.dart';
 
 Widget buildDismissibleBackground({

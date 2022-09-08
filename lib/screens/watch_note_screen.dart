@@ -1,13 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:notes_keeper/databases/db_helper.dart';
-import 'package:notes_keeper/models/note.dart';
-import 'package:notes_keeper/screens/add_update_note_screen.dart';
-import 'package:notes_keeper/utils/assets_constants.dart';
-import 'package:notes_keeper/utils/helper_widgets.dart';
-
+import '../databases/db_helper.dart';
+import '../models/note.dart';
+import '../utils/assets_constants.dart';
 import '../utils/color_constants.dart';
+import '../utils/helper_widgets.dart';
+import 'add_update_note_screen.dart';
 import 'components/action_icon_widget.dart';
 import 'components/delete_note_alert_dialog_widget.dart';
 

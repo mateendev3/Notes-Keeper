@@ -145,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: BlocBuilder<NotesBloc, NotesState>(
               builder: (context, state) {
-                print(state.toString());
                 if (state is NotesLoadingState || state is NotesInitialState) {
                   return const Center(
                     child: CircularProgressIndicator(

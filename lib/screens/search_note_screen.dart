@@ -77,7 +77,6 @@ class _SearchNoteScreenState extends State<SearchNoteScreen> {
           Expanded(
             child: BlocBuilder<SearchBloc, SearchState>(
               builder: (context, state) {
-                print(state);
                 if (state is SearchInitialState ||
                     state is SearchLoadingListState) {
                   return const Center(

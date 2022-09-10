@@ -1,9 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/notes/notes_bloc.dart';
-import '../bloc/notes/notes_event.dart';
+import '../bloc/notes_bloc_imports.dart';
 import '../models/note.dart';
 import '../utils/assets_constants.dart';
 import '../utils/color_constants.dart';

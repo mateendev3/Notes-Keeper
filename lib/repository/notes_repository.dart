@@ -1,5 +1,5 @@
-import 'package:notes_keeper/databases/db_helper.dart';
-import 'package:notes_keeper/models/note.dart';
+import '../databases/db_helper.dart';
+import '../models/note.dart';
 
 class NotesRepository {
   final DBHelper _dbHelper = DBHelper();

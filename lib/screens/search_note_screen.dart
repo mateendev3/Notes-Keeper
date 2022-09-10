@@ -1,5 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
-import '../databases/db_helper.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/search_bloc_imports.dart';
 import '../models/note.dart';
 import '../utils/assets_constants.dart';
 import '../utils/color_constants.dart';
@@ -20,22 +22,17 @@ class _SearchNoteScreenState extends State<SearchNoteScreen> {
   late final TextEditingController _searchController;
   late List<Note> _noteList;
   late List<Note> _filteredList;
-  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    refreshNotes();
     _searchController = TextEditingController();
   }
 
-  void refreshNotes() async {
-    setState(() => _isLoading = true);
-
-    _noteList = await DBHelper().readAllNotes();
-    _filteredList = _noteList;
-
-    setState(() => _isLoading = false);
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -72,22 +69,47 @@ class _SearchNoteScreenState extends State<SearchNoteScreen> {
       ),
       child: Column(
         children: [
-          _buildSearchNoteTF(),
+          BlocBuilder<SearchBloc, SearchState>(
+            builder: (context, state) {
+              return _buildSearchNoteTF();
+            },
+          ),
           Expanded(
-            child: _isLoading
-                ? const Center(
+            child: BlocBuilder<SearchBloc, SearchState>(
+              builder: (context, state) {
+                print(state);
+                if (state is SearchInitialState ||
+                    state is SearchLoadingListState) {
+                  return const Center(
                     child: CircularProgressIndicator(
                       color: AppColors.white,
                     ),
-                  )
-                : _buildBodyUi(),
+                  );
+                } else if (state is SearchLoadedListState) {
+                  _noteList = state.notes;
+                  _filteredList = _noteList;
+                  return _buildEmptyOrList();
+                } else if (state is SearchGetNotesWithTextState) {
+                  _filteredList = state.filteredNotes;
+                  return _buildEmptyOrList();
+                } else if (state is SearchErrorState) {
+                  return Center(
+                    child: Text(state.message),
+                  );
+                } else {
+                  return const Center(
+                    child: Text('Something went wrong'),
+                  );
+                }
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBodyUi() {
+  Widget _buildEmptyOrList() {
     return _filteredList.isNotEmpty
         ? _buildNotesListView()
         : buildEmptyNotesUi(
@@ -117,7 +139,7 @@ class _SearchNoteScreenState extends State<SearchNoteScreen> {
             : IconButton(
                 onPressed: () {
                   _searchController.clear();
-                  refreshNotes();
+                  context.read<SearchBloc>().add(SearchGetAllNotesEvent());
                 },
                 icon: const Icon(
                   Icons.cancel,
@@ -173,15 +195,13 @@ class _SearchNoteScreenState extends State<SearchNoteScreen> {
           ),
         ),
       );
-      refreshNotes();
+      context.read<SearchBloc>().add(SearchGetAllNotesEvent());
     };
   }
 
   void _onChangedText(String value) {
-    _filteredList = _noteList
-        .where(
-            (note) => note.title!.toLowerCase().contains(value.toLowerCase()))
-        .toList();
-    setState(() {});
+    context
+        .read<SearchBloc>()
+        .add(SearchGetNotesWithTextEvent(value, _noteList));
   }
 }

@@ -1,8 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../models/note.dart';
 import '../../repository/notes_repository.dart';
-import 'notes_event.dart';
-import 'notes_state.dart';
+import '../notes_bloc_imports.dart';
 
 class NotesBloc extends Bloc<NotesEvent, NotesState> {
   final NotesRepository _notesRepository = NotesRepository();

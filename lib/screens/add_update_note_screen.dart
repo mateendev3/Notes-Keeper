@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/notes/notes_bloc.dart';
 import '../bloc/notes/notes_event.dart';
-import '../databases/db_helper.dart';
 import '../models/note.dart';
 import 'components/action_button_widget.dart';
 import 'components/action_icon_widget.dart';
@@ -22,7 +21,6 @@ class AddUpdateNoteScreen extends StatefulWidget {
 
 class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
   late Size _size;
-  late DBHelper _db;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
@@ -32,11 +30,17 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
   void initState() {
     super.initState();
 
-    _db = DBHelper();
     _titleController = TextEditingController();
     _descriptionController = TextEditingController();
     _titleController.text = widget.note?.title ?? '';
     _descriptionController.text = widget.note?.description ?? '';
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   @override

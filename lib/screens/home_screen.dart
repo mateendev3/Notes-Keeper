@@ -1,6 +1,11 @@
+// ignore_for_file: avoid_print, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import '../databases/db_helper.dart';
+import '../bloc/notes/notes_bloc.dart';
+import '../bloc/notes/notes_event.dart';
+import '../bloc/notes/notes_state.dart';
 import '../models/note.dart';
 import '../utils/assets_constants.dart';
 import '../utils/color_constants.dart';
@@ -26,32 +31,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late Size _size;
   bool _showGrid = true;
-  bool _isLoading = false;
   late List<Note> _noteList;
-  late final DBHelper _db;
   bool _wannaDeleteListItem = false;
-
-  @override
-  void initState() {
-    _db = DBHelper();
-    super.initState();
-
-    refreshNotes();
-  }
 
   @override
   void dispose() {
     closeDB();
     super.dispose();
-  }
-
-  // method to refresh notes (get notes from db)
-  void refreshNotes() async {
-    setState(() => _isLoading = true);
-
-    _noteList = await _db.readAllNotes();
-
-    setState(() => _isLoading = false);
   }
 
   @override
@@ -73,8 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: () async {
             bool agree = await showDeleteAllNotesDialog(context);
             if (agree) {
-              await _db.deleteNotes();
-              refreshNotes();
+              context.read<NotesBloc>().add(DeleteAllNotesEvent());
             }
           },
           rightMargin: 8.0,
@@ -143,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (_showGrid) {
                       return;
                     } else {
-                      setState(() => _showGrid = true);
+                      context.read<NotesBloc>().add(ShowNotesInGridEvent());
                     }
                   },
                 ),
@@ -153,9 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (!_showGrid) {
                       return;
                     } else {
-                      setState(() {
-                        _showGrid = false;
-                      });
+                      context.read<NotesBloc>().add(ShowNotesInListEvent());
                     }
                   },
                 ),
@@ -163,13 +146,44 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Expanded(
-            child: _isLoading
-                ? const Center(
+            child: BlocBuilder<NotesBloc, NotesState>(
+              builder: (context, state) {
+                print(state.toString());
+                if (state is NotesLoadingState || state is NotesInitialState) {
+                  return const Center(
                     child: CircularProgressIndicator(
                       color: AppColors.white,
                     ),
-                  )
-                : _buildListOrEmpty(),
+                  );
+                } else if (state is NotesLoadedState) {
+                  _noteList = state.notes;
+                  return _buildListOrEmpty();
+                } else if (state is AllNotesDeletedState) {
+                  _noteList = [];
+                  return _buildListOrEmpty();
+                } else if (state is ShowNotesInViewState) {
+                  _showGrid = state.inGrid;
+                  return _buildListOrEmpty();
+                } else if (state is DeleteNoteState) {
+                  _noteList = state.notes;
+                  return _buildListOrEmpty();
+                } else if (state is CreateNoteState) {
+                  _noteList = state.notes;
+                  return _buildListOrEmpty();
+                } else if (state is UpdateNoteState) {
+                  _noteList = state.notes;
+                  return _buildListOrEmpty();
+                } else if (state is NotesErrorState) {
+                  return Center(
+                    child: Text(state.message),
+                  );
+                } else {
+                  return const Center(
+                    child: Text('Something went wrong'),
+                  );
+                }
+              },
+            ),
           ),
         ],
       ),
@@ -198,7 +212,6 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (_) => const AddUpdateNoteScreen(),
             ),
           );
-          refreshNotes();
         },
         backgroundColor: AppColors.white,
         child: Icon(
@@ -288,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void closeDB() async => await _db.closeDatabase();
+  void closeDB() => context.read<NotesBloc>().add(CloseDBEvent());
 
   VoidCallback onNoteItemTap(int index) {
     return () async {
@@ -300,7 +313,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       );
-      refreshNotes();
     };
   }
 
@@ -309,11 +321,8 @@ class _HomeScreenState extends State<HomeScreen> {
       bool wannaDeleteGridItem = await showDeleteNoteDialog(context);
 
       if (wannaDeleteGridItem) {
-        _db.deleteNote(_noteList[index].id!);
-        setState(() {
-          _noteList.remove(_noteList[index]);
-          wannaDeleteGridItem = false;
-        });
+        context.read<NotesBloc>().add(DeleteNoteEvent(_noteList[index].id!));
+        wannaDeleteGridItem = false;
       }
     };
   }
@@ -323,11 +332,8 @@ class _HomeScreenState extends State<HomeScreen> {
       _wannaDeleteListItem = await showDeleteNoteDialog(context);
 
       if (_wannaDeleteListItem) {
-        _db.deleteNote(_noteList[index].id!);
-        setState(() {
-          _noteList.remove(_noteList[index]);
-          _wannaDeleteListItem = false;
-        });
+        context.read<NotesBloc>().add(DeleteNoteEvent(_noteList[index].id!));
+        _wannaDeleteListItem = false;
 
         return true;
       }

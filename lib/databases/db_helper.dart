@@ -80,32 +80,37 @@ class DBHelper {
   }
 
   // update note
-  Future<int> updateNote(Note note) async {
+  Future<bool> updateNote(Note note) async {
     final Database db = await _getDB();
 
-    return await db.update(
+    int changesMade = await db.update(
       DBConsts.tableName,
       note.toMap(),
       where: '${DBConsts.colId} = ?',
       whereArgs: [note.id],
     );
+
+    return changesMade > 0;
   }
 
   // delete note
-  Future<int> deleteNote(int id) async {
+  Future<bool> deleteNote(int id) async {
     final Database db = await _getDB();
 
-    return await db.delete(
+    int rowsEffected = await db.delete(
       DBConsts.tableName,
       where: '${DBConsts.colId} = ?',
       whereArgs: [id],
     );
+
+    return rowsEffected > 0;
   }
 
   // delete all notes
-  Future<int> deleteNotes() async {
+  Future<bool> deleteNotes() async {
     final Database db = await _getDB();
 
-    return await db.rawDelete(DBConsts.deleteEverythingCommand);
+    int changesMade = await db.rawDelete(DBConsts.deleteEverythingCommand);
+    return changesMade > 0;
   }
 }

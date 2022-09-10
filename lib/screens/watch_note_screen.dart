@@ -1,7 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import '../databases/db_helper.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/notes/notes_bloc.dart';
+import '../bloc/notes/notes_event.dart';
 import '../models/note.dart';
 import '../utils/assets_constants.dart';
 import '../utils/color_constants.dart';
@@ -22,12 +24,10 @@ class WatchNoteScreen extends StatefulWidget {
 class _WatchNoteScreenState extends State<WatchNoteScreen> {
   late Size _size;
   late Note _note;
-  late DBHelper _db;
 
   @override
   void initState() {
     _note = widget.note;
-    _db = DBHelper();
     super.initState();
   }
 
@@ -63,7 +63,7 @@ class _WatchNoteScreenState extends State<WatchNoteScreen> {
           onTap: () async {
             bool agree = await showDeleteNoteDialog(context);
             if (agree) {
-              await _db.deleteNote(_note.id!);
+              context.read<NotesBloc>().add(DeleteNoteEvent(_note.id!));
               Navigator.pop(context);
             }
           },
@@ -80,7 +80,6 @@ class _WatchNoteScreenState extends State<WatchNoteScreen> {
                 ),
               ),
             );
-            setState(() {});
           },
           rightMargin: 15.0,
           icon: Icons.edit_outlined,

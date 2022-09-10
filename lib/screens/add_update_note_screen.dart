@@ -1,6 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/notes/notes_bloc.dart';
+import '../bloc/notes/notes_event.dart';
 import '../databases/db_helper.dart';
 import '../models/note.dart';
 import 'components/action_button_widget.dart';
@@ -41,7 +44,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
     _size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: _buildAppBar(),
-      body: _buildBody(),
+      body: _buildBody(context),
     );
   }
 
@@ -63,7 +66,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
         left: _size.height * 0.015,
@@ -90,35 +93,37 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
     );
   }
 
-  void onTapSave() async {
+  void onTapSave() {
     bool isValid = _formKey.currentState!.validate();
 
     if (isValid) {
       if (widget.note != null) {
-        await updateNote();
+        updateNote();
         Navigator.pop(context, _note);
       } else {
-        await insertNote();
+        insertNote(context);
         Navigator.pop(context);
       }
     }
   }
 
-  Future<void> updateNote() async {
+  void updateNote() {
     _note = widget.note!.copyWith(
       title: _titleController.text,
       description: _descriptionController.text,
     );
-    await _db.updateNote(_note);
+    context.read<NotesBloc>().add(UpdateNoteEvent(_note));
   }
 
-  Future<void> insertNote() async {
-    await _db.insertNote(
-      Note(
-        title: _titleController.text,
-        description: _descriptionController.text,
-        time: DateTime.now(),
-      ),
-    );
+  void insertNote(BuildContext context) {
+    context.read<NotesBloc>().add(
+          CreateNoteEvent(
+            Note(
+              title: _titleController.text,
+              description: _descriptionController.text,
+              time: DateTime.now(),
+            ),
+          ),
+        );
   }
 }

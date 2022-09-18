@@ -27,6 +27,7 @@ class _SearchNoteScreenState extends State<SearchNoteScreen> {
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+    context.read<SearchBloc>().add(SearchGetAllNotesEvent());
   }
 
   @override
